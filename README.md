@@ -13,7 +13,7 @@
   <p>No external depth maps or separate video processing tools needed - everything is handled automatically in one seamless workflow!</p>
 </div>
 
-<img width="1254" alt="parallax_workflow" src="https://github.com/SamSeen/SSParallaxX/raw/main/examples/workflow_example.png">
+<img width="1254" alt="parallax_workflow" src="https://github.com/SamSeen/SSParallaxX/raw/main/SS_Video_00001.gif">
 
 <p>Welcome to the SSParallaxX repository for ComfyUI! 🚀 Create stunning parallax animations that bring your images to life with realistic 3D motion! This powerful depth-estimation node transforms ordinary 2D images into immersive animations where objects move based on their depth in the scene. Perfect for creating eye-catching content that leaps off the screen with realistic depth!</p>
 
@@ -26,11 +26,13 @@
 <p>This repository provides powerful parallax animation and video handling nodes for creating stunning 3D motion effects:</p>
 
 ### Core Animation Node
+
 <ul>
   <li><strong>👀 3D Parallax Animation by SamSeen</strong>: Our flagship AI-powered depth estimation node that creates stunning parallax animations. Just feed it your standard 2D images and watch as it automatically creates immersive animations with realistic depth perception.</li>
 </ul>
 
 ### Video Processing Nodes
+
 <ul>
   <li><strong>👀 SS Image Uploader by SamSeen</strong>: A simple yet powerful tool for loading and resizing single images with customizable dimensions, perfect for creating consistent 3D content from various image sources.</li>
   <li><strong>👀 SS Images to Video Combiner by SamSeen</strong>: Combine your processed image sequences back into stunning videos or GIFs with support for multiple formats (MP4, WebM, GIF) and audio integration for complete immersive experiences.</li>
@@ -56,6 +58,7 @@ pip install -r requirements.txt
 <p>This node uses advanced depth estimation to automatically generate depth maps from your images, then creates parallax animations where objects move based on their depth:</p>
 
 #### Input Parameters:
+
 <ul>
   <li><strong>base_image</strong>: The input image to animate</li>
   <li><strong>num_frames</strong>: Number of frames to generate (default: 20)</li>
@@ -69,6 +72,7 @@ pip install -r requirements.txt
 </ul>
 
 #### Outputs:
+
 <ul>
   <li><strong>frames</strong>: The generated animation frames as an image sequence</li>
   <li><strong>depth_map</strong>: The generated depth map for further processing or analysis</li>
@@ -79,6 +83,7 @@ pip install -r requirements.txt
 <p>This node loads and resizes a single image:</p>
 
 #### Input Parameters:
+
 <ul>
   <li><strong>image</strong>: Select an image file to upload</li>
   <li><strong>max_width</strong>: Maximum width for resizing (default: 512)</li>
@@ -86,6 +91,7 @@ pip install -r requirements.txt
 </ul>
 
 #### Outputs:
+
 <ul>
   <li><strong>image</strong>: The loaded and resized image</li>
 </ul>
@@ -95,6 +101,7 @@ pip install -r requirements.txt
 <p>This node combines a sequence of images into a video or GIF:</p>
 
 #### Input Parameters:
+
 <ul>
   <li><strong>images</strong>: The input image sequence to combine</li>
   <li><strong>frame_rate</strong>: Frames per second for the output video (default: 30)</li>
@@ -105,6 +112,7 @@ pip install -r requirements.txt
 </ul>
 
 #### Outputs:
+
 <ul>
   <li><strong>video_path</strong>: Path to the generated video file</li>
 </ul>
