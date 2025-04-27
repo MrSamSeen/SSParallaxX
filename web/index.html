@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SS Parallax Nodes</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+      }
+      h2 {
+        color: #2980b9;
+        margin-top: 20px;
+      }
+      .node-info {
+        background-color: #f9f9f9;
+        border-left: 4px solid #3498db;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 0 5px 5px 0;
+      }
+      .node-name {
+        font-weight: bold;
+        color: #2c3e50;
+      }
+      .description {
+        margin-top: 10px;
+      }
+      .parameters {
+        margin-top: 10px;
+      }
+      .parameter {
+        margin-left: 20px;
+        margin-bottom: 5px;
+      }
+      .parameter-name {
+        font-weight: bold;
+        color: #e74c3c;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SS Parallax Nodes</h1>
+
+    <p>
+      This extension provides nodes for creating parallax animations and 3D
+      content in ComfyUI.
+    </p>
+
+    <h2>Parallax and Video Utility Nodes</h2>
+
+    <div class="node-info">
+      <div class="node-name">👀 SS Image Uploader by SamSeen</div>
+      <div class="description">Load a single image with resizing options.</div>
+      <div class="parameters">
+        <div class="parameter">
+          <span class="parameter-name">image:</span> Select an image file to
+          upload
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">max_width:</span> Maximum width for
+          resizing (default: 512)
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">max_height:</span> Maximum height for
+          resizing (0 = auto)
+        </div>
+      </div>
+    </div>
+
+    <div class="node-info">
+      <div class="node-name">👀 SS Image Uploader by SamSeen</div>
+      <div class="description">Load a single image with resizing options.</div>
+      <div class="parameters">
+        <div class="parameter">
+          <span class="parameter-name">image:</span> Select an image file to
+          upload
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">max_width:</span> Maximum width for
+          resizing (default: 512)
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">max_height:</span> Maximum height for
+          resizing (0 = auto)
+        </div>
+      </div>
+    </div>
+
+    <div class="node-info">
+      <div class="node-name">👀 SS Images to Video Combiner by SamSeen</div>
+      <div class="description">
+        Combine a sequence of images into a video file.
+      </div>
+      <div class="parameters">
+        <div class="parameter">
+          <span class="parameter-name">images:</span> Input images to combine
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">frame_rate:</span> Frame rate of the
+          output video (default: 30)
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">filename_prefix:</span> Prefix for the
+          output filename
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">format:</span> Output video format (mp4,
+          webm, gif)
+        </div>
+        <div class="parameter">
+          <span class="parameter-name">save_output:</span> Whether to save the
+          output to the output directory
+        </div>
+      </div>
+    </div>
+
+    <h2>Usage</h2>
+
+    <p>
+      These nodes can be used to create a workflow for processing images into
+      parallax animations:
+    </p>
+
+    <ol>
+      <li>Use the <strong>👀 SS Image Uploader</strong> to load an image</li>
+      <li>
+        Process the image with the
+        <strong>👀 3D Parallax Animation by SamSeen</strong> node
+      </li>
+      <li>
+        Combine the generated frames into a video with the
+        <strong>👀 SS Images to Video Combiner</strong> node
+      </li>
+    </ol>
+
+    <p>
+      The parallax generator creates frames with a 3D effect where objects
+      appear to move based on their depth in the scene.
+    </p>
+  </body>
+</html>
