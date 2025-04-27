@@ -1,0 +1,35 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test output directories
+parallax_test_output/
+
+# Model files
+*.pth
+*.safetensors
+*.ckpt
+
+# Logs
+*.log
+
+# OS specific files
+.DS_Store
+Thumbs.db
