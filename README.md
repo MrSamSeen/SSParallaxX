@@ -17,6 +17,8 @@
 
 ## Introduction
 
+<img src="https://github.com/MrSamSeen/SSParallaxX/blob/main/Screenshot.png?raw=true" alt="Parallax Animation Example - Transform any 2D image into stunning parallax animations with depth-based motion">
+
 <p>The SSParallaxX node is a cutting-edge 2D-to-3D animation tool designed for ComfyUI to generate professional-quality parallax animations with built-in depth map generation. Powered by advanced AI depth estimation, it automatically creates high-quality depth maps from your images, eliminating the need for external depth sources. This tool creates immersive animations where objects appear to move in 3D space based on their depth in the scene, creating a stunning visual effect that brings your images to life!</p>
 
 ## Available Nodes
