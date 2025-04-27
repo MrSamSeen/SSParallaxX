@@ -12,8 +12,7 @@
   </ol>
   <p>No external depth maps or separate video processing tools needed - everything is handled automatically in one seamless workflow!</p>
 </div>
-
-<img width="1254" alt="parallax_workflow" src="https://github.com/SamSeen/SSParallaxX/raw/main/SS_Video_00001.gif">
+![Transform any 2D image into stunning parallax animations with depth-based motion!](SS_Video_00001.gif)
 
 <p>Welcome to the SSParallaxX repository for ComfyUI! 🚀 Create stunning parallax animations that bring your images to life with realistic 3D motion! This powerful depth-estimation node transforms ordinary 2D images into immersive animations where objects move based on their depth in the scene. Perfect for creating eye-catching content that leaps off the screen with realistic depth!</p>
 
