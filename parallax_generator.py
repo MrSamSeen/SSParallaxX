@@ -143,11 +143,12 @@ class Parallax_Generator_by_SamSeen:
                 "base_image": ("IMAGE",),
                 "num_frames": ("INT", {"default": 120, "min": 5, "max": 1200, "step": 1}),
                 "horizontal_shift": ("FLOAT", {"default": 20.0, "min": 0.0, "max": 100.0, "step": 0.5}),
-                "vertical_shift": ("FLOAT", {"default": 2.0, "min": 0.0, "max": 100.0, "step": 0.5}),
+                "vertical_shift": ("FLOAT", {"default": 3.0, "min": 0.0, "max": 100.0, "step": 0.5}),
                 "blur_radius": ("INT", {"default": 3, "min": 1, "max": 51, "step": 2}),
-                "invert_depth": ("BOOLEAN", {"default": True}),
+                "invert_depth": ("BOOLEAN", {"default": False}),
                 "clockwise": ("BOOLEAN", {"default": True}),
                 "loop_type": (["Forward", "Bounce"], {"default": "Forward"}),
+                "edge_fix_method": (["None", "Crop and Zoom", "Ease-In"], {"default": "Crop and Zoom"}),
             },
             "optional": {
                 "external_depth_map": ("IMAGE",),
@@ -158,7 +159,7 @@ class Parallax_Generator_by_SamSeen:
     RETURN_NAMES = ("frames", "depth_map")
     FUNCTION = "process"
     CATEGORY = "👀 SamSeen"
-    DESCRIPTION = "Create stunning parallax animations with elliptical motion using depth maps. Generates a sequence of frames where objects appear to move in a realistic 3D way based on their depth. Use with SS_Images_to_Video_Combiner to create videos or GIFs."
+    DESCRIPTION = "Create stunning parallax animations with elliptical motion using depth maps. Generates a sequence of frames where objects appear to move in a realistic 3D way based on their depth. Includes edge artifact fixing options: None (keep artifacts), Crop and Zoom (crop and resize), or Ease-In (fade depth at edges). Use with SS_Images_to_Video_Combiner to create videos or GIFs."
 
     def generate_depth_map(self, image_tensor):
         """
@@ -214,7 +215,7 @@ class Parallax_Generator_by_SamSeen:
         return depth_map_batch
 
     def process(self, base_image, num_frames, horizontal_shift, vertical_shift, blur_radius,
-                invert_depth=False, clockwise=True, loop_type="Bounce", external_depth_map=None):
+                invert_depth=False, clockwise=True, loop_type="Bounce", edge_fix_method="None", external_depth_map=None):
         """
         Create a parallax animation from a standard image with elliptical motion.
 
@@ -227,6 +228,7 @@ class Parallax_Generator_by_SamSeen:
         - invert_depth: boolean to invert the depth map (swap foreground/background).
         - clockwise: boolean to control the direction of the elliptical motion.
         - loop_type: type of loop for the animation ("Forward" or "Bounce").
+        - edge_fix_method: method to fix edge artifacts ("None", "Crop and Zoom", or "Ease-In").
         - external_depth_map: optional external depth map.
 
         Returns:
@@ -297,6 +299,62 @@ class Parallax_Generator_by_SamSeen:
             width, height = current_image_pil.size
             depth_map_img = depth_map_img.resize((width, height), Image.NEAREST)
 
+            # Apply edge fix method if selected
+            if edge_fix_method == "Ease-In":
+                print("Applying Ease-In to depth map to reduce edge artifacts...")
+                # Create a vignette mask that reduces depth values near the edges
+                vignette_mask = np.ones((height, width), dtype=np.float32)
+
+                # Calculate the border sizes based on the respective shift values
+                # Add 20% margin to ensure all artifacts are covered
+                h_border_size = int(horizontal_shift * 1.2)
+                v_border_size = int(vertical_shift * 1.2)
+
+                # Ensure border sizes are reasonable
+                h_border_size = min(h_border_size, width // 4)
+                v_border_size = min(v_border_size, height // 4)
+
+                print(f"Using horizontal border: {h_border_size}px, vertical border: {v_border_size}px")
+
+                # Create a vignette that fades out at the edges with different horizontal and vertical values
+                for y in range(height):
+                    for x in range(width):
+                        # Calculate distance from each edge
+                        dist_from_left = x
+                        dist_from_right = width - 1 - x
+                        dist_from_top = y
+                        dist_from_bottom = height - 1 - y
+
+                        # Calculate horizontal and vertical factors separately
+                        h_factor = 1.0
+                        v_factor = 1.0
+
+                        # Apply horizontal fade if within h_border_size of left/right edge
+                        if dist_from_left < h_border_size:
+                            h_factor = min(h_factor, dist_from_left / h_border_size)
+                        if dist_from_right < h_border_size:
+                            h_factor = min(h_factor, dist_from_right / h_border_size)
+
+                        # Apply vertical fade if within v_border_size of top/bottom edge
+                        if dist_from_top < v_border_size:
+                            v_factor = min(v_factor, dist_from_top / v_border_size)
+                        if dist_from_bottom < v_border_size:
+                            v_factor = min(v_factor, dist_from_bottom / v_border_size)
+
+                        # Combine factors - use the minimum to ensure proper fading in corners
+                        vignette_mask[y, x] = min(h_factor, v_factor)
+
+                # Apply the vignette to the depth map
+                depth_map_array = np.array(depth_map_img)
+                depth_map_array = depth_map_array * vignette_mask
+                depth_map_img = Image.fromarray(depth_map_array.astype(np.uint8), mode='L')
+
+                # Debug: Save the vignette mask for visualization
+                vignette_debug = (vignette_mask * 255).astype(np.uint8)
+                vignette_debug_path = f"vignette_mask_h{h_border_size}_v{v_border_size}.png"
+                Image.fromarray(vignette_debug, mode='L').save(vignette_debug_path)
+                print(f"Saved vignette mask visualization to {vignette_debug_path}")
+
             # Calculate the number of frames based on loop type
             actual_frames = num_frames
             if loop_type == "Bounce":
@@ -307,6 +365,27 @@ class Parallax_Generator_by_SamSeen:
             frames = []
             pbar = ProgressBar(actual_frames)
             print(f"Generating {actual_frames} frames with horizontal_shift={horizontal_shift}, vertical_shift={vertical_shift}...")
+
+            # Collect all pixels with their depth values (do this once for all frames)
+            print("Preparing depth-ordered pixel processing to reduce artifacts...")
+            pixels = []
+            for y in range(height):
+                for x in range(width):
+                    # Get depth value at this pixel
+                    depth_value = depth_map_img.getpixel((x, y))
+                    if isinstance(depth_value, tuple):
+                        depth_value = depth_value[0]
+
+                    # Normalize depth value to 0-1
+                    depth_value = depth_value / 255.0
+
+                    # Store the pixel info (original coordinates and depth value)
+                    pixels.append((x, y, depth_value))
+
+            # Sort pixels by depth value (lowest/closest first, highest/farthest last)
+            # This ensures pixels that move more are drawn first
+            print("Sorting pixels by depth value (closest first)...")
+            pixels.sort(key=lambda p: p[2])
 
             # Calculate angle step for each frame (full circle = 2*pi)
             angle_step = 2 * np.pi / num_frames
@@ -327,31 +406,22 @@ class Parallax_Generator_by_SamSeen:
                 # Create a new image for the current frame
                 frame = np.zeros((height, width, 3), dtype=np.uint8)
 
-                # Apply parallax effect based on depth map
-                for y in range(height):
-                    for x in range(width):
-                        # Get depth value at this pixel
-                        depth_value = depth_map_img.getpixel((x, y))
-                        if isinstance(depth_value, tuple):
-                            depth_value = depth_value[0]
+                # Apply parallax effect based on pre-sorted depth values
+                for x, y, depth_value in pixels:
+                    # Calculate pixel shift based on depth and current elliptical components
+                    h_pixel_shift = depth_value * current_h_shift
+                    v_pixel_shift = depth_value * current_v_shift
 
-                        # Normalize depth value to 0-1
-                        depth_value = depth_value / 255.0
+                    # Apply shift in both directions
+                    new_x = int(x + h_pixel_shift)
+                    new_y = int(y + v_pixel_shift)
 
-                        # Calculate pixel shift based on depth and current elliptical components
-                        h_pixel_shift = depth_value * current_h_shift
-                        v_pixel_shift = depth_value * current_v_shift
+                    # Ensure coordinates are within bounds
+                    new_x = max(0, min(width - 1, new_x))
+                    new_y = max(0, min(height - 1, new_y))
 
-                        # Apply shift in both directions
-                        new_x = int(x + h_pixel_shift)
-                        new_y = int(y + v_pixel_shift)
-
-                        # Ensure coordinates are within bounds
-                        new_x = max(0, min(width - 1, new_x))
-                        new_y = max(0, min(height - 1, new_y))
-
-                        # Copy pixel from original image to new position
-                        frame[new_y, new_x] = current_image_pil.getpixel((x, y))
+                    # Copy pixel from original image to new position
+                    frame[new_y, new_x] = current_image_pil.getpixel((x, y))
 
                 # Fill any holes in the frame (pixels that weren't assigned)
                 frame = self.fill_holes(frame)
@@ -365,6 +435,41 @@ class Parallax_Generator_by_SamSeen:
             if loop_type == "Bounce" and len(frames) > 1:
                 reversed_frames = frames[-2::-1]  # Exclude the last frame and reverse
                 frames.extend(reversed_frames)
+
+            # Apply Crop and Zoom if selected
+            if edge_fix_method == "Crop and Zoom":
+                print("Applying Crop and Zoom to remove edge artifacts...")
+
+                # Calculate the crop margins based on the horizontal and vertical shift values
+                # Add a small margin (20%) to ensure all artifacts are removed
+                h_margin = int(horizontal_shift * 1.2)
+                v_margin = int(vertical_shift * 1.2)
+
+                # Ensure margins are not too large
+                h_margin = min(h_margin, width // 4)
+                v_margin = min(v_margin, height // 4)
+
+                # Process each frame
+                cropped_frames = []
+                for frame_tensor in frames:
+                    # Convert to numpy for processing
+                    frame_np = frame_tensor.cpu().numpy()
+
+                    # Crop the frame
+                    cropped = frame_np[v_margin:height-v_margin, h_margin:width-h_margin, :]
+
+                    # Resize back to original dimensions
+                    cropped_pil = Image.fromarray((cropped * 255).astype(np.uint8))
+                    resized_pil = cropped_pil.resize((width, height), Image.LANCZOS)
+
+                    # Convert back to tensor
+                    resized_np = np.array(resized_pil).astype(np.float32) / 255.0
+                    resized_tensor = torch.tensor(resized_np)
+
+                    cropped_frames.append(resized_tensor)
+
+                # Replace the original frames with the cropped and zoomed frames
+                frames = cropped_frames
 
             # Add to our batch lists
             all_frames.extend(frames)

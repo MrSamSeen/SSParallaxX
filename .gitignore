@@ -21,6 +21,7 @@ ENV/
 
 # Test output directories
 parallax_test_output/
+edge_fix_test*/
 
 # Model files
 *.pth
@@ -33,3 +34,6 @@ parallax_test_output/
 # OS specific files
 .DS_Store
 Thumbs.db
+
+# Tutorial
+ComfyUI_custom_node_tutorial.html

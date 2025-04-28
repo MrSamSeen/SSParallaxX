@@ -1,7 +1,7 @@
 [project]
 name = "SSParallaxX_bySamSeen"
 description = "Create stunning parallax animations! Transform your ComfyUI generations into immersive 3D animations with realistic depth-based motion. Powered by advanced depth estimation, no external depth maps needed. Perfect for creating eye-catching content that leaps off the screen with realistic depth!"
-version = "0.9.0"
+version = "0.9.1"
 license = "LICENSE"
 dependencies = ["numpy", "Pillow", "torch", "transformers>=4.51.0", "opencv-python", "tqdm"]
 keywords = ["parallax", "3D", "SS", "animation", "depth-map", "motion", "ComfyUI", "depth-estimation", "3D-animation", "depth-anything", "3D-video", "3D-motion", "gif", "video", "AI-depth", "immersive", "depth-based-motion"]
