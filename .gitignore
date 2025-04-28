@@ -20,8 +20,11 @@ ENV/
 *.swo
 
 # Test output directories
-parallax_test_output/
 edge_fix_test*/
+parallax_test_output
+
+# Test files
+test*.py
 
 # Model files
 *.pth
