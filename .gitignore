@@ -41,4 +41,4 @@ Thumbs.db
 # Tutorial
 ComfyUI_custom_node_tutorial.html
 
-__pycache__
+__pycache__/
